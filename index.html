@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flying Bird Animation</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flying Bird Animation</h1>
+    <button onclick="startAnimation()">Play</button>
+    <canvas id="animationCanvas" width="800" height="600"></canvas>
+    <img id="birdImage" src="bird.jpg" style="display:none;">
+    <img id="backgroundImage" src="memeee.png" style="display:none;">
+    <audio id="backgroundMusic" src="Interstellar.mp3" loop></audio>
+
+    <script>
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const inclineAngle = 40;
+        const birdWidth = 50;
+        const birdHeight = 50;
+
+        const bird = { x: 100, y: canvas.height - 100 - birdHeight, speed: 3, state: 'moving' };
+
+        let animation;
+
+        function drawBackground() {
+            const backgroundImage = document.getElementById('backgroundImage');
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        function drawBird() {
+            const birdImage = document.getElementById('birdImage');
+            ctx.drawImage(birdImage, bird.x, bird.y, birdWidth, birdHeight);
+        }
+
+        function updateBirdPosition() {
+            const inclineEndX = 100 + canvas.width * Math.cos(Math.PI * inclineAngle / 180);
+
+            if (bird.state === 'moving' && bird.x + birdWidth < inclineEndX) {
+                bird.x += bird.speed * Math.cos(Math.PI * inclineAngle / 180);
+                bird.y -= bird.speed * Math.sin(Math.PI * inclineAngle / 180);
+            } else if (bird.state === 'moving') {
+                bird.state = 'falling';
+            }
+
+            if (bird.state === 'falling') {
+                bird.y += bird.speed;
+            }
+        }
+
+        function resetBirdPosition() {
+            bird.x = 100;
+            bird.y = canvas.height - 100 - birdHeight;
+            bird.state = 'moving';
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            drawBird();
+            updateBirdPosition();
+        }
+
+        function startAnimation() {
+            if (animation) {
+                clearInterval(animation);
+                const backgroundMusic = document.getElementById('backgroundMusic');
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
+            resetBirdPosition();
+            animation = setInterval(draw, 1000 / 60);
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            backgroundMusic.play();
+        }
+    </script>
+</body>
+</html>
